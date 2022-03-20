@@ -13,17 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->references('id')->on('users');
+            $table->integer('uid');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('profile')->nullable();
             $table->foreignId('city_id')->references('id')->on('cities');
-            $table->text('videoUrl');
-            $table->text('photoUrl');
-            $table->text('location')->nullable();
-            $table->longText('description')->nullable();
-            $table->integer('likes')->default(0);
             $table->integer('comments')->default(0);
-            $table->integer('reported')->default(0);
+            $table->integer('posts')->default(0);
+            $table->integer('reviews')->default(0);
+            $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('users');
     }
 };

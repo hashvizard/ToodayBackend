@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        foreach (config('city.cities') as  $value) {
+           \App\Models\City::create([
+               'city'=> $value
+           ]);
+        }
     }
 }
