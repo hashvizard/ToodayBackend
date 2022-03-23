@@ -1,29 +1,34 @@
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
+use App\Http\Requests\UserRegisterRequest;
+use App\Traits\ApiResponse;
+
 class PassportAuthController extends Controller
 {
+    use ApiResponse;
     /**
      * Registration
      */
-    public function register(Request $request)
+    public function register(UserRegisterRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|min:4',
-            'email' => 'required|email',
-            'password' => 'required|min:8',
-        ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
+        try {
+            $user = User::create($request->all());
 
-        $token = $user->createToken('LaravelAuthApp')->accessToken;
+            $token = $user->createToken('LaravelAuthApp')->accessToken;
+            if (!$token) {
+                return $this->unprocessableApiResponse(__('tooday.error'));
+            }
 
-        return response()->json(['token' => $token], 200);
+            $data=["user"=>$user,"token"=>$token];
+
+            return $this->successApiResponse(__('tooday.adduser'), $data);
+
+        } catch (\Exception $e) {
+            return $this->errorApiResponse(__('tooday.error'));
+        }
     }
 
     /**

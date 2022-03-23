@@ -15,11 +15,12 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->integer('uid');
+            $table->string('uid')->nullable();
+            $table->string('password');
             $table->string('name');
             $table->string('email')->unique();
             $table->string('profile')->nullable();
-            $table->foreignId('city_id')->references('id')->on('cities');
+            $table->foreignId('city_id')->nullable() ->references('id')->on('cities');
             $table->integer('comments')->default(0);
             $table->integer('posts')->default(0);
             $table->integer('reviews')->default(0);
