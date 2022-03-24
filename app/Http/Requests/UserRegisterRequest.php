@@ -29,7 +29,6 @@ class UserRegisterRequest extends FormRequest
         return [
             'email' => 'required|email',
             'name' => 'required|string|min:4',
-            'password' => 'required|min:8',
             'uid' => 'required'
         ];
     }
