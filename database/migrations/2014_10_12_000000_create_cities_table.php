@@ -16,8 +16,6 @@ return new class extends Migration
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
             $table->string('city');
-            $table->integer('total_users')->default(0);
-            $table->integer('total_posts')->default(0);
             $table->timestamps();
         });
     }
