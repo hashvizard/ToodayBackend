@@ -7,20 +7,11 @@ use Request;
 trait ApiResponse {
 
 	public function successApiResponse($message, $data = null) {
-
-        if($data == null) {
-            return response()->json([
-                'status' => true,
-                'message' => $message,
-            ], Response::HTTP_OK);
-        } else{
             return response()->json([
                 'status' => true,
                 'message' => $message,
                 'data' => $data,
             ], Response::HTTP_OK);
-        }
-
 	}
 
 	public function errorApiResponse($message) {
