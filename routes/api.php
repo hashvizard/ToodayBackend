@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PassportAuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,6 +24,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('cities', [CityController::class, 'index']);
     Route::post('cities', [CityController::class, 'userCity']);
+
+    //Profile Routes
+    Route::post('profile/pic', [ProfileController::class, 'updatePhoto']);
+    Route::post('profile/name', [ProfileController::class, 'updateName']);
     Route::resource('posts', PostController::class);
 
 });

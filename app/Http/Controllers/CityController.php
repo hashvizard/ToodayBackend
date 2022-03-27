@@ -39,7 +39,7 @@ class CityController extends Controller
             DB::beginTransaction();
             $cityData = City::where('city', $city)->get()->pluck('id');
             User::where('id', Auth::user()->id)->update(['city_id' => $cityData[0]]);
-            $getCity = City::where('id', $city)->get(['id', 'city'])->toArray();
+            $getCity = City::where('city', $city)->get(['id', 'city'])->toArray();
             DB::commit();
             return $this->successApiResponse(__('tooday.cities'), $getCity);
         } catch (\Exception $e) {
