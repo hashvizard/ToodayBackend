@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlockedController;
 use App\Http\Controllers\CityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,8 @@ Route::middleware('auth:api')->group(function () {
 
     // Reviews
     Route::resource('reviews', ReviewController::class);
+    //Block
+    Route::resource('blocked', BlockedController::class);
     Route::resource('posts', PostController::class);
 
 });
