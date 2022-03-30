@@ -2,33 +2,34 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Traits\ApiResponse;
+
 class PostController extends Controller
 {
+    Use ApiResponse;
     public function index()
     {
-        $posts = auth()->user()->posts;
-
-        return response()->json([
-            'success' => true,
-            'data' => $posts
-        ]);
+        try {
+            $posts = auth()->user()->posts;
+            return $this->successApiResponse(__('tooday.cities'), $posts);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
+        }
     }
 
     public function show($id)
     {
-        $post = auth()->user()->posts()->find($id);
+        try {
+            $posts = Post::where('user_id',$id)->orderBy('id', 'desc')->offset(0)->paginate(18,['id','photoUrl','likes','location','created_at','description','comments','videoUrl'])->toArray();
+            if ($posts['next_page_url'] != null) {
+                $data = explode('/api/', $posts['next_page_url']);
+                $posts['next_page_url'] = $data[1];
+            }
 
-        if (!$post) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Post not found '
-            ], 400);
+            return $this->successApiPostResponse(__('tooday.cities'), $posts);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $post->toArray()
-        ], 400);
     }
 
     public function store(Request $request)

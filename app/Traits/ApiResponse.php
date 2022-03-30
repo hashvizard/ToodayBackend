@@ -14,6 +14,14 @@ trait ApiResponse {
             ], Response::HTTP_OK);
 	}
 
+    public function successApiPostResponse($message, $data = null) {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'posts' => $data,
+        ], Response::HTTP_OK);
+}
+
 	public function errorApiResponse($message) {
 		return response()->json([
 			'status' => false,
