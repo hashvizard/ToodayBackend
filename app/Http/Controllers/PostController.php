@@ -20,7 +20,7 @@ class PostController extends Controller
     public function show($id)
     {
         try {
-            $posts = Post::where('user_id',$id)->orderBy('id', 'desc')->offset(0)->paginate(18,['id','photoUrl','likes','location','created_at','description','comments','videoUrl'])->toArray();
+            $posts = Post::where('user_id',$id)->orderBy('id', 'desc')->paginate(18,['id','photoUrl','likes','location','created_at','description','comments','videoUrl'])->toArray();
             if ($posts['next_page_url'] != null) {
                 $data = explode('/api/', $posts['next_page_url']);
                 $posts['next_page_url'] = $data[1];
