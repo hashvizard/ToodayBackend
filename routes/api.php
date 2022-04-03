@@ -2,13 +2,12 @@
 
 use App\Http\Controllers\BlockedController;
 use App\Http\Controllers\CityController;
-use App\Http\Controllers\LikeController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PassportAuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ViewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +36,6 @@ Route::middleware('auth:api')->group(function () {
     //Block
     Route::resource('blocked', BlockedController::class);
     Route::resource('posts', PostController::class);
-    Route::resource('liked', LikeController::class);
+    Route::resource('view', ViewController::class);
 
 });

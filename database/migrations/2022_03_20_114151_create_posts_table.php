@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('photoUrl');
             $table->text('location')->nullable();
             $table->longText('description')->nullable();
-            $table->integer('likes')->default(0);
+            $table->integer('views')->default(0);
             $table->integer('comments')->default(0);
             $table->integer('reported')->default(0);
             $table->timestamps();

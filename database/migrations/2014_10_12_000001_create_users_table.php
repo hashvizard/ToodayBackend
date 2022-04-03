@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('profile')->nullable();
             $table->foreignId('city_id')->nullable() ->references('id')->on('cities');
             $table->integer('comments')->default(0);
-            $table->integer('likes')->default(0);
+            $table->integer('views')->default(0);
             $table->integer('posts')->default(0);
             $table->integer('reviews')->default(0);
             $table->rememberToken();

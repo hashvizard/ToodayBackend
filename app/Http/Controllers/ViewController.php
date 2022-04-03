@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Like;
+use App\Models\View;
 use App\Models\Post;
+use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class LikeController extends Controller
+class ViewController extends Controller
 {
     use ApiResponse;
     /**
@@ -38,7 +41,19 @@ class LikeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+            View::create($request->all());
+            Post::where('id', $request->post_id)
+                ->increment('views', 1);
+            User::where('id', $request->user_id)
+                ->increment('views', 1);
+            DB::commit();
+            return $this->successApiPostResponse(__('tooday.cities'));
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $this->errorApiResponse($e);
+        }
     }
 
     /**
@@ -51,11 +66,11 @@ class LikeController extends Controller
     {
         try {
             $likedPostsIds = [];
-            $likedPosts = Like::where('user_id', $id)->orderBy('id', 'desc')->paginate(18, ['id', 'post_id'])->toArray();
+            $likedPosts = View::where('user_id', $id)->orderBy('id', 'desc')->paginate(18, ['id', 'post_id'])->toArray();
             foreach ($likedPosts['data'] as $key => $value) {
                 array_push($likedPostsIds, $value['post_id']);
             }
-            $posts = Post::whereIn('id', $likedPostsIds)->get(['id', 'photoUrl', 'likes', 'location', 'created_at', 'description', 'comments', 'videoUrl'])->toArray();
+            $posts = Post::whereIn('id', $likedPostsIds)->get(['id', 'photoUrl', 'views', 'location', 'created_at', 'description', 'comments', 'videoUrl'])->toArray();
             if ($likedPosts['next_page_url'] != null) {
                 $data = explode('/api/', $likedPosts['next_page_url']);
                 $data = ['data' => $posts, 'next_page_url' => $data[1]];
@@ -99,6 +114,12 @@ class LikeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $userId = Auth::user()->id;
+            $unliked = View::where(['user_id' => $userId, 'post_id' => $id])->delete();
+            return $this->successApiPostResponse(__('tooday.cities'), $unliked);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
+        }
     }
 }

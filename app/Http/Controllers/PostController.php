@@ -3,14 +3,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Traits\ApiResponse;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
     Use ApiResponse;
+
     public function index()
     {
         try {
-            $posts = auth()->user()->posts;
+            $City_id = Auth::user()->city_id;
+            $posts = Post::with('user:id,name,profile')->where('city_id',$City_id)->orderBy('id', 'desc')->paginate(12)->toArray();
+            if ($posts['next_page_url'] != null) {
+                $data = explode('/api/', $posts['next_page_url']);
+                $posts['next_page_url'] = $data[1];
+            }
             return $this->successApiResponse(__('tooday.cities'), $posts);
         } catch (\Exception $e) {
             return $this->errorApiResponse($e);
@@ -20,7 +27,7 @@ class PostController extends Controller
     public function show($id)
     {
         try {
-            $posts = Post::where('user_id',$id)->orderBy('id', 'desc')->paginate(18,['id','photoUrl','likes','location','created_at','description','comments','videoUrl'])->toArray();
+            $posts = Post::where('user_id',$id)->orderBy('id', 'desc')->paginate(18,['id','photoUrl','views','location','created_at','description','comments','videoUrl'])->toArray();
             if ($posts['next_page_url'] != null) {
                 $data = explode('/api/', $posts['next_page_url']);
                 $posts['next_page_url'] = $data[1];

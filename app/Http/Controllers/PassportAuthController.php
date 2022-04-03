@@ -37,7 +37,7 @@ class PassportAuthController extends Controller
                 }
             }
             # If user doesn't exists create a new user
-            $data['password'] = bcrypt($data['email'] . $data['uid']);
+            $data['password'] = bcrypt($data['email'].$data['uid']);
             $user = User::create($data);
             $token = $user->createToken('tooday_token')->accessToken;
             if (!$token) {
@@ -56,7 +56,7 @@ class PassportAuthController extends Controller
     public function login(Request $request)
     {
         $RequestData = $request->all();
-        $RequestData['password'] = $RequestData['email'] . $RequestData['uid'];
+        $RequestData['password'] = $RequestData['email'].$RequestData['uid'];
 
         $data = [
             'email' => $RequestData['email'],
