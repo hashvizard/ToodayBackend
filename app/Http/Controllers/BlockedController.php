@@ -45,7 +45,12 @@ class BlockedController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $data = Block::upsert([$request->all()],['block_unique'],['blocker_user_id','blocked_user_id']);
+            return $this->successApiResponse("Success", $data);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
+        }
     }
 
     /**

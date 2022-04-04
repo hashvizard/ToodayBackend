@@ -10,7 +10,7 @@ class Block extends Model
 {
     use HasFactory;
 
-
+    protected $fillable = ['blocker_user_id','blocked_user_id'];
     /**
      * Get the user that owns the Block
      *

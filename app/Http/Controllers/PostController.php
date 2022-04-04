@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers;
+
+use App\Models\Block;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Traits\ApiResponse;
@@ -13,7 +15,8 @@ class PostController extends Controller
     {
         try {
             $City_id = Auth::user()->city_id;
-            $posts = Post::with('user:id,name,profile')->where('city_id',$City_id)->orderBy('id', 'desc')->paginate(12)->toArray();
+            $blockedusers = Block::where('blocker_user_id',Auth::user()->id)->pluck('blocked_user_id');
+            $posts = Post::with('user:id,name,profile')->whereNotIn('user_id',$blockedusers)->where('city_id',$City_id)->orderBy('id', 'desc')->paginate(12)->toArray();
             if ($posts['next_page_url'] != null) {
                 $data = explode('/api/', $posts['next_page_url']);
                 $posts['next_page_url'] = $data[1];
