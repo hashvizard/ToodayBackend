@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PassportAuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ViewController;
 
@@ -37,5 +38,6 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('blocked', BlockedController::class);
     Route::resource('posts', PostController::class);
     Route::resource('view', ViewController::class);
-
+    //Report
+    Route::resource('report', ReportController::class);
 });
