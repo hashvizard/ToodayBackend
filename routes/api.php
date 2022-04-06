@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlockedController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PassportAuthController;
 use App\Http\Controllers\PostController;
@@ -40,4 +41,6 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('view', ViewController::class);
     //Report
     Route::resource('report', ReportController::class);
+    // Comment's
+    Route::resource('comment', CommentController::class);
 });
