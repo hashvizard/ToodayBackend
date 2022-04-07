@@ -32,7 +32,8 @@ Route::middleware('auth:api')->group(function () {
     //Profile Routes
     Route::post('profile/pic', [ProfileController::class, 'updatePhoto']);
     Route::post('profile/name', [ProfileController::class, 'updateName']);
-
+    Route::post('profile/bio', [ProfileController::class, 'updateBio']);
+    Route::post('profile/profession', [ProfileController::class, 'updateProfession']);
     // Reviews
     Route::resource('reviews', ReviewController::class);
     //Block
