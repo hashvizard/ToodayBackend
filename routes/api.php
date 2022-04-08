@@ -39,6 +39,7 @@ Route::middleware('auth:api')->group(function () {
     //Block
     Route::resource('blocked', BlockedController::class);
     Route::resource('posts', PostController::class);
+    Route::get('posts/user/{id}', [PostController::class,'userPosts']);
     Route::resource('view', ViewController::class);
     //Report
     Route::resource('report', ReportController::class);

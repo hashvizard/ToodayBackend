@@ -20,9 +20,27 @@ class PostController extends Controller
 
             $blockedusers = Block::where('blocker_user_id',Auth::user()->id)->pluck('blocked_user_id');
 
-            $posts = Post::with('user:id,name,profile')->whereNotIn('user_id',$blockedusers)->whereNotIn('id',$reportedPosts)->where([
+            $posts = Post::with('user:id,name,profile,bio,profession,views,posts,reviews,comments')->whereNotIn('user_id',$blockedusers)->whereNotIn('id',$reportedPosts)->where([
                 ['city_id','=',$City_id],
                 ['reported','<',5]
+                ])->orderBy('id', 'desc')->paginate(12)->toArray();
+
+            if ($posts['next_page_url'] != null) {
+                $data = explode('/api/', $posts['next_page_url']);
+                $posts['next_page_url'] = $data[1];
+            }
+            return $this->successApiResponse(__('tooday.cities'), $posts);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
+        }
+    }
+
+    public function userPosts($id){
+        try {
+            $reportedPosts = Report::where('user_id',$id)->pluck('post_id');
+            $posts = Post::with('user:id,name,profile,bio,profession,views,posts,reviews,comments')->whereNotIn('id',$reportedPosts)->where([
+                ['reported','<',5],
+                ['user_id','=',$id]
                 ])->orderBy('id', 'desc')->paginate(12)->toArray();
 
             if ($posts['next_page_url'] != null) {
