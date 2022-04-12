@@ -70,7 +70,7 @@ class ViewController extends Controller
             foreach ($likedPosts['data'] as $key => $value) {
                 array_push($likedPostsIds, $value['post_id']);
             }
-            $posts = Post::whereIn('id', $likedPostsIds)->get(['id', 'photoUrl', 'views', 'location', 'created_at', 'description', 'comments', 'videoUrl'])->toArray();
+            $posts = Post::with('user:id,name,profile,bio,profession,views,posts,reviews,comments')->whereIn('id', $likedPostsIds)->get()->toArray();
             if ($likedPosts['next_page_url'] != null) {
                 $data = explode('/api/', $likedPosts['next_page_url']);
                 $data = ['data' => $posts, 'next_page_url' => $data[1]];
