@@ -104,24 +104,11 @@ class PostController extends Controller
 
     public function destroy($id)
     {
-        $post = auth()->user()->posts()->find($id);
-
-        if (!$post) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Post not found'
-            ], 400);
-        }
-
-        if ($post->delete()) {
-            return response()->json([
-                'success' => true
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Post can not be deleted'
-            ], 500);
+        try {
+            $posts = Post::where('id',$id)->delete();
+            return $this->successApiPostResponse(__('tooday.cities'), $posts);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
         }
     }
 }
