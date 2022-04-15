@@ -68,6 +68,7 @@ class PostController extends Controller
         }
     }
 
+
     public function store(Request $request)
     {
         try {
@@ -80,26 +81,12 @@ class PostController extends Controller
 
     public function update(Request $request, $id)
     {
-        $post = auth()->user()->posts()->find($id);
-
-        if (!$post) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Post not found'
-            ], 400);
+        try {
+            $posts = Post::where('id',$id)->update($request->all());
+            return $this->successApiPostResponse(__('tooday.cities'), $posts);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
         }
-
-        $updated = $post->fill($request->all())->save();
-
-        if ($updated)
-            return response()->json([
-                'success' => true
-            ]);
-        else
-            return response()->json([
-                'success' => false,
-                'message' => 'Post can not be updated'
-            ], 500);
     }
 
     public function destroy($id)
