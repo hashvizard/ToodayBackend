@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Report;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -71,10 +73,29 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
+
         try {
-            $posts = Post::create($request->all());
-            return $this->successApiPostResponse(__('tooday.cities'), $posts);
+            $user=Auth::user();
+
+            $videoPath =$request->file(key:'videoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
+            Storage::disk(name:'s3')->setVisibility($videoPath,visibility:'public');
+            $thumbnailPath =$request->file(key:'photoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
+            Storage::disk(name:'s3')->setVisibility($thumbnailPath,visibility:'public');
+
+            $post = Post::create([
+                'user_id'=>$user->id,
+                'city_id'=>$user->city_id,
+                'videoUrl'=>Storage::disk(name:'s3')->url($videoPath),
+                'photoUrl'=>Storage::disk(name:'s3')->url($thumbnailPath),
+                'location'=>$request->location,
+                'description'=>$request->description
+            ]);
+            $user->posts = $user->posts + 1;
+            $user->save();
+            return $post;
+            return $this->successApiPostResponse(__('tooday.cities'), $post);
         } catch (\Exception $e) {
+            return $e;
             return $this->errorApiResponse($e);
         }
     }
