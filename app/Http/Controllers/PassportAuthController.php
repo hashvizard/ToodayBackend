@@ -18,10 +18,13 @@ class PassportAuthController extends Controller
     {
         try {
             $data = $request->all();
-            $user = User::with('cities:id,city')->where('uid', $data['uid'])->get()->toArray();
+            $user = User::with('cities:id,city')->where('email', $data['email'])->get()->toArray();
             # Check whether user exists in database
+
             if (count($user)) {
+
                 $token = $this->login($request);
+
                 if ($token) {
                     if ($user[0]['cities'] == null) {
                         unset($user[0]['cities']);
@@ -37,13 +40,14 @@ class PassportAuthController extends Controller
                 }
             }
             # If user doesn't exists create a new user
-            $data['password'] = bcrypt($data['email'].$data['uid']);
+            $data['password'] = bcrypt($data['email'].$data['email']);
             $user = User::create($data);
+
             $token = $user->createToken('tooday_token')->accessToken;
             if (!$token) {
                 return $this->unprocessableApiResponse(__('tooday.error'));
             }
-            $data = ["user" => $user, "token" => $token];
+            $data = ["user" => [$user], "token" => $token];
             return $this->successApiResponse(__('tooday.adduser'), $data);
         } catch (\Exception $e) {
             return $this->errorApiResponse($e);
@@ -55,8 +59,9 @@ class PassportAuthController extends Controller
      */
     public function login(Request $request)
     {
+
         $RequestData = $request->all();
-        $RequestData['password'] = $RequestData['email'].$RequestData['uid'];
+        $RequestData['password'] = $RequestData['email'].$RequestData['email'];
 
         $data = [
             'email' => $RequestData['email'],
@@ -67,6 +72,7 @@ class PassportAuthController extends Controller
             $token = auth()->user()->createToken('tooday_token')->accessToken;
             return $token;
         } else {
+            dd("I amm here");
             return null;
         }
     }
