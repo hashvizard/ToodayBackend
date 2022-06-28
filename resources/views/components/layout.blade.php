@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
 </head>
 <body class="is-boxed has-animations">
-    <div class="body-wrap ">
+    <div class="body-wrap">
     {{$slot}}
     <footer class="site-footer">
         <div class="footer-particles-container">
@@ -23,10 +23,10 @@
                 <div class="container-sm">
                     <div class="cta-inner section-inner">
                         <div class="cta-header text-center">
-                            <h2 class="section-title mt-0">Stay in the know</h2>
-                            <p class="section-paragraph">Lorem ipsum is common placeholder text used to demonstrate the graphic elements of a document or visual presentation.</p>
+                            <h2 class="section-title mt-0">Being Tooder</h2>
+                            <p class="section-paragraph">Follow the trend, and join the Community</p>
                             <div class="cta-cta">
-                                <a class="button button-primary button-wide-mobile" href="#">Be a Tooder</a>
+                                <a class="button button-primary button-wide-mobile" href="https://play.google.com/store/apps/details?id=com.hashvizard.tooday">Download now or regret later</a>
                             </div>
                         </div>
                     </div>
