@@ -44,10 +44,12 @@ class PassportAuthController extends Controller
             $user = User::create($data);
 
             $token = $user->createToken('tooday_token')->accessToken;
+            $user = User::where('id',$user->id)->get()->toArray();
             if (!$token) {
                 return $this->unprocessableApiResponse(__('tooday.error'));
             }
-            $data = ["user" => [$user], "token" => $token];
+
+            $data = ["user" => $user, "token" => $token];
             return $this->successApiResponse(__('tooday.adduser'), $data);
         } catch (\Exception $e) {
             return $this->errorApiResponse($e);
@@ -59,7 +61,6 @@ class PassportAuthController extends Controller
      */
     public function login(Request $request)
     {
-
         $RequestData = $request->all();
         $RequestData['password'] = $RequestData['email'].$RequestData['email'];
 
@@ -67,12 +68,12 @@ class PassportAuthController extends Controller
             'email' => $RequestData['email'],
             'password' => $RequestData['password']
         ];
+
         # Log in user to database
         if (auth()->attempt($data)) {
             $token = auth()->user()->createToken('tooday_token')->accessToken;
             return $token;
         } else {
-            dd("I amm here");
             return null;
         }
     }

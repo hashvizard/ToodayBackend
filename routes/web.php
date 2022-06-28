@@ -16,3 +16,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Privacy-policy
+Route::get('/privacy-policy', function () {
+    return view('privacyPolicy');
+})->name('privacy-policy');
+
+// Terms & Condition
+Route::get('/tnc', function () {
+    return view('tnc');
+})->name('tnc');
