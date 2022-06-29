@@ -21,6 +21,8 @@ use App\Http\Controllers\ViewController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::group(['middleware' => ['cors']], function () {
+
 Route::post('register', [PassportAuthController::class, 'register']);
 
 Route::middleware('auth:api')->group(function () {
@@ -46,4 +48,5 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('report', ReportController::class);
     // Comment's
     Route::resource('comment', CommentController::class);
+});
 });
