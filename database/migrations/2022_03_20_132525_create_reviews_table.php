@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('profile_user_id')->references('id')->on('users')->comment('The person on whose profile review is written');
-            $table->foreignId('writer_user_id')->references('id')->on('users')->comment('The person who wrote the review for the user');
+            $table->foreignId('profile_user_id')->references('id')->on('users')->onDelete('cascade')->comment('The person on whose profile review is written');
+            $table->foreignId('writer_user_id')->references('id')->on('users')->onDelete('cascade')->comment('The person who wrote the review for the user');
             $table->text('review');
             $table->timestamps();
         });

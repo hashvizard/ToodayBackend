@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('cities', function (Blueprint $table) {
-            $table->id();
-            $table->string('city');
-            $table->integer('limit')->default(99);
-            $table->timestamps();
+        Schema::table('views', function (Blueprint $table) {
+            $table->unique(["user_id", "post_id"], 'unique_view');
         });
     }
 
@@ -28,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cities');
+        Schema::table('views', function (Blueprint $table) {
+            $table->dropUnique('unique_view');
+        });
     }
 };

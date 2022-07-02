@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -15,6 +16,7 @@ class FeedSeeder extends Seeder
      */
     public function run()
     {
+        Post::insert(config('feed'));
         foreach (config('feed.videos') as  $value) {
             \App\Models\Post::create([
                 'user_id'=> User::all()->random()->id,

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Post;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -19,5 +20,18 @@ class DatabaseSeeder extends Seeder
                'city'=> $value
            ]);
         }
+
+   /*      foreach (config('feed') as  $value) {
+            \App\Models\Post::create([
+                "user_id"=> $value['user_id'],
+                "city_id"=> $value['city_id'],
+                "videoUrl"=>$value['videoUrl'] ,
+                "photoUrl"=> $value['photoUrl'],
+                "location"=> $value['location'],
+                "description"=> $value['description']
+            ]);
+         }
+ */
+        Post::insert(config('feed'));
     }
 }
