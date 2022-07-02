@@ -11,7 +11,7 @@ class View extends Model
     use HasFactory;
 
 
-    protected $fillable = ['post_id','user_id'];
+    protected $fillable = ['post_id','user_id','updated_at'];
     /**
      * Relation for liked Posts
      *
