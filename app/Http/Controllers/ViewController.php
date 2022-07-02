@@ -43,11 +43,14 @@ class ViewController extends Controller
     {
         try {
             DB::beginTransaction();
-            View::create($request->all());
-            Post::where('id', $request->post_id)
+            $viewed = View::upsert($request->all(),['unique_view'],['updated_at']);
+            // Upsert return 1 if something is created, 2 when updated, 0 if nothing happened
+            if($viewed == 1){
+                Post::where('id', $request->post_id)
                 ->increment('views', 1);
-            User::where('id', $request->user_id)
+                User::where('id', $request->user_id)
                 ->increment('views', 1);
+            }
             DB::commit();
             return $this->successApiPostResponse(__('tooday.cities'));
         } catch (\Exception $e) {

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
             $table->string('city');
+            $table->integer('limit')->default(99);
             $table->timestamps();
         });
     }

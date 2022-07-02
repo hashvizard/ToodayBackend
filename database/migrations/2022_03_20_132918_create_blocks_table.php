@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('blocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('blocker_user_id')->references('id')->on('users')->comment('The person on who blocked');
-            $table->foreignId('blocked_user_id')->references('id')->on('users')->comment('The person blocked');
+            $table->foreignId('blocker_user_id')->references('id')->on('users')->onDelete('cascade')->comment('The person on who blocked');
+            $table->foreignId('blocked_user_id')->references('id')->on('users')->onDelete('cascade')->comment('The person blocked');
             $table->timestamps();
         });
     }
