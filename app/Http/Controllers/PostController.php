@@ -25,7 +25,7 @@ class PostController extends Controller
             $posts = Post::with('user:id,name,profile,bio,profession,views,posts,reviews,comments')->whereNotIn('user_id',$blockedusers)->whereNotIn('id',$reportedPosts)->where([
                 ['city_id','=',$City_id],
                 ['reported','<',5]
-                ])->orderBy('id', 'desc')->paginate(12)->toArray();
+                ])->inRandomOrder()->paginate(12)->toArray();
 
             if ($posts['next_page_url'] != null) {
                 $data = explode('/api/', $posts['next_page_url']);
