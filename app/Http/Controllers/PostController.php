@@ -125,7 +125,7 @@ class PostController extends Controller
             $videoPath = $request->file(key:'videoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
 
             Storage::disk(name:'s3')->setVisibility($videoPath,visibility:'public');
-            $thumbnailPath =$request->file(key:'photoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
+            $thumbnailPath =$request->file(key:'photoUrl')->store(path:'thumbnail/'.$user->city_id.'/'.$user->uid,options:'s3');
             Storage::disk(name:'s3')->setVisibility($thumbnailPath,visibility:'public');
 
             $post = Post::create([
@@ -142,7 +142,7 @@ class PostController extends Controller
 
             return $this->successApiPostResponse(__('tooday.cities'), $post);
         } catch (\Exception $e) {
-            return $this->errorApiResponse($e);
+            return $this->errorApiResponse($e->getMessage());
         }
     }
 
