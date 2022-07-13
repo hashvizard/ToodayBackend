@@ -27,11 +27,13 @@ Route::post('register', [PassportAuthController::class, 'register']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('userinfo', [PassportAuthController::class, 'user']);
-
     Route::get('cities', [CityController::class, 'index']);
     Route::post('cities', [CityController::class, 'userCity']);
-
-    //Profile Routes
+    // admin post route
+    Route::get('admin/posts', [PostController::class,'adminPosts']);
+    // Post Views
+    Route::get('posts/views/{id}', [PostController::class,'postViewUsers']);
+     //Profile Routes
     Route::post('profile/pic', [ProfileController::class, 'updatePhoto']);
     Route::post('profile/name', [ProfileController::class, 'updateName']);
     Route::post('profile/bio', [ProfileController::class, 'updateBio']);
@@ -51,3 +53,17 @@ Route::middleware('auth:api')->group(function () {
 });
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+

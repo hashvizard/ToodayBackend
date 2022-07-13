@@ -5,6 +5,8 @@ use App\Models\Block;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Report;
+use App\Models\User;
+use App\Models\View;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +26,8 @@ class PostController extends Controller
 
             $posts = Post::with('user:id,name,profile,bio,profession,views,posts,reviews,comments')->whereNotIn('user_id',$blockedusers)->whereNotIn('id',$reportedPosts)->where([
                 ['city_id','=',$City_id],
-                ['reported','<',5]
+                ['reported','<',5],
+                ['status','=',0]
                 ])->orderBy('id', 'DESC')->paginate(12)->toArray();
 
             shuffle($posts['data']);
@@ -39,12 +42,54 @@ class PostController extends Controller
         }
     }
 
+    // Showing all posts views [Users]
+    public function postViewUsers($id)
+    {
+        try {
+            $viewPeople = View::where('post_id',$id)->orderBy('id', 'ASC')->paginate(12,'user_id');
+            $viewPeopleAllData = $viewPeople->toArray();
+            $userIdArray = $viewPeople->pluck('user_id');
+            if ($viewPeopleAllData['next_page_url'] != null) {
+
+                $data = explode('/api/', $viewPeopleAllData['next_page_url']);
+                $viewPeopleAllData['next_page_url'] = $data[1];
+            }
+            $viewPeopleAllData['data'] = $userIdArray->toArray();
+
+            $users = User::whereIn('id',$viewPeopleAllData['data'])->get()->toArray();
+            $viewPeopleAllData['data'] = $users;
+            return $this->successApiResponse('success',$viewPeopleAllData);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
+        }
+    }
+
+
+    // Showing all posts to admin
+    public function adminPosts()
+    {
+        try {
+            $posts = Post::with('user:id,name,profile,bio,profession,views,posts,reviews,comments')->where([
+                ['status','=',1]
+                ])->orderBy('id', 'ASC')->paginate(12)->toArray();
+
+            if ($posts['next_page_url'] != null) {
+                $data = explode('/api/', $posts['next_page_url']);
+                $posts['next_page_url'] = $data[1];
+            }
+            return $this->successApiResponse('success', $posts);
+        } catch (\Exception $e) {
+            return $this->errorApiResponse($e);
+        }
+    }
+
     public function userPosts($id){
         try {
             $reportedPosts = Report::where('user_id',$id)->pluck('post_id');
             $posts = Post::with('user:id,name,profile,bio,profession,views,posts,reviews,comments')->whereNotIn('id',$reportedPosts)->where([
                 ['reported','<',5],
-                ['user_id','=',$id]
+                ['user_id','=',$id],
+                ['status','=',0]
                 ])->orderBy('id', 'desc')->paginate(12)->toArray();
 
             if ($posts['next_page_url'] != null) {
@@ -75,11 +120,10 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-
         try {
             $user=Auth::user();
+            $videoPath = $request->file(key:'videoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
 
-            $videoPath =$request->file(key:'videoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
             Storage::disk(name:'s3')->setVisibility($videoPath,visibility:'public');
             $thumbnailPath =$request->file(key:'photoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
             Storage::disk(name:'s3')->setVisibility($thumbnailPath,visibility:'public');
@@ -92,15 +136,17 @@ class PostController extends Controller
                 'location'=>$request->location,
                 'description'=>$request->description
             ]);
+
             $user->posts = $user->posts + 1;
             $user->save();
-            return $post;
+
             return $this->successApiPostResponse(__('tooday.cities'), $post);
         } catch (\Exception $e) {
-            return $e;
             return $this->errorApiResponse($e);
         }
     }
+
+
 
     public function update(Request $request, $id)
     {
