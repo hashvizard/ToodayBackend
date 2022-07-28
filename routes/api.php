@@ -33,6 +33,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('admin/posts', [PostController::class,'adminPosts']);
     // Post Views
     Route::get('posts/views/{id}', [PostController::class,'postViewUsers']);
+    //Post live
+    Route::get('post/live/{id}', [PostController::class,'setlive']);
      //Profile Routes
     Route::post('profile/pic', [ProfileController::class, 'updatePhoto']);
     Route::post('profile/name', [ProfileController::class, 'updateName']);

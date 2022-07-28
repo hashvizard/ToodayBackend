@@ -1,7 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
+
 use App\Models\Block;
+use App\Models\City;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Report;
@@ -10,6 +12,7 @@ use App\Models\View;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
@@ -79,7 +82,7 @@ class PostController extends Controller
             }
             return $this->successApiResponse('success', $posts);
         } catch (\Exception $e) {
-            return $this->errorApiResponse($e);
+            return $this->errorApiResponse($e->getMessage());
         }
     }
 
@@ -122,16 +125,14 @@ class PostController extends Controller
     {
         try {
             $user=Auth::user();
-            $videoPath = $request->file(key:'videoUrl')->store(path:'videos/'.$user->city_id.'/'.$user->uid,options:'s3');
 
-            Storage::disk(name:'s3')->setVisibility($videoPath,visibility:'public');
-            $thumbnailPath =$request->file(key:'photoUrl')->store(path:'thumbnail/'.$user->city_id.'/'.$user->uid,options:'s3');
+            $thumbnailPath =$request->file(key:'photoUrl')->store(path:'thumbnail',options:'s3');
             Storage::disk(name:'s3')->setVisibility($thumbnailPath,visibility:'public');
 
             $post = Post::create([
                 'user_id'=>$user->id,
                 'city_id'=>$user->city_id,
-                'videoUrl'=>Storage::disk(name:'s3')->url($videoPath),
+                'videoUrl'=>$request->videoUrl,
                 'photoUrl'=>Storage::disk(name:'s3')->url($thumbnailPath),
                 'location'=>$request->location,
                 'description'=>$request->description
@@ -140,7 +141,36 @@ class PostController extends Controller
             $user->posts = $user->posts + 1;
             $user->save();
 
-            return $this->successApiPostResponse(__('tooday.cities'), $post);
+            // Checking whether limit has exceeded or not for city
+            $totalPosts = Post::where([
+                ['city_id','=',$user->city_id],
+                ['status','=',0]
+                ])->count();
+            $cityLimit  = City::where('id',$user->city_id)->get('limit')->toArray();
+
+            if($totalPosts > $cityLimit[0]['limit']){
+                $removePosts = $totalPosts - $cityLimit[0]['limit'];
+
+                $data = Post::where('city_id',$user->city_id)->orderBy('id', 'ASC')->limit($removePosts)->get()->toArray(); // the oldest entry
+
+                foreach ($data as $key => $value) {
+                    $post = Post::where('id',$value['id'])->get(['videoUrl','photoUrl'])->toArray();
+                    $videoUrl = str_replace('https://tooday.s3.amazonaws.com/','',$post[0]['videoUrl']);
+                    $videoUrl = str_replace('%2F','/',$videoUrl);
+
+                    $photoUrl = str_replace('https://tooday.s3.ap-south-1.amazonaws.com/','',$post[0]['photoUrl']);
+
+                    // Deleting video and thumbnail from s3
+                    Storage::disk(name:'s3')->delete($videoUrl);
+                    Storage::disk(name:'s3')->delete($photoUrl);
+
+                    Post::where('id',$value['id'])->delete();
+                }
+
+            }
+
+            return $this->successApiPostResponse(__('success'));
+
         } catch (\Exception $e) {
             return $this->errorApiResponse($e->getMessage());
         }
@@ -158,13 +188,41 @@ class PostController extends Controller
         }
     }
 
-    public function destroy($id)
+
+    // Set video to live
+    public function setlive($id)
     {
         try {
-            $posts = Post::where('id',$id)->delete();
+            $posts = Post::where('id',$id)->update([
+                'status' => 0
+             ]);
             return $this->successApiPostResponse(__('tooday.cities'), $posts);
         } catch (\Exception $e) {
             return $this->errorApiResponse($e);
+        }
+    }
+
+
+    public function destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+            $post = Post::where('id',$id)->get(['videoUrl','photoUrl'])->toArray();
+            $videoUrl = str_replace('https://tooday.s3.amazonaws.com/','',$post[0]['videoUrl']);
+            $videoUrl = str_replace('%2F','/',$videoUrl);
+
+            $photoUrl = str_replace('https://tooday.s3.ap-south-1.amazonaws.com/','',$post[0]['photoUrl']);
+
+            // Deleting video and thumbnail from s3
+            Storage::disk(name:'s3')->delete($videoUrl);
+            Storage::disk(name:'s3')->delete($photoUrl);
+
+            Post::where('id',$id)->delete();
+            DB::commit();
+            return $this->successApiPostResponse(__('success'));
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $this->errorApiResponse($e->getMessage());
         }
     }
 }
