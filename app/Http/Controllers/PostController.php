@@ -134,6 +134,7 @@ class PostController extends Controller
                 'city_id'=>$user->city_id,
                 'videoUrl'=>$request->videoUrl,
                 'photoUrl'=>Storage::disk(name:'s3')->url($thumbnailPath),
+                'status'=>0,
                 'location'=>$request->location,
                 'description'=>$request->description
             ]);
